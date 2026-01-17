@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elythra Share | Profesional Kod Paylaşımı</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            yellow: '#FACC15', // Sarı
+                            dark: '#0f0f0f',    // Koyu Siyah
+                            gray: '#18181b',    // Koyu Gri
+                            panel: '#121212',   // Panel Arkaplan
+                            light: '#e4e4e7'    // Açık Gri yazı
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e4e4e7;
+        }
+        /* Özel Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #18181b; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FACC15; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #EAB308; 
+        }
+        
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .glass-panel:hover {
+             border-color: rgba(250, 204, 21, 0.3);
+        }
+
+        .code-preview {
+            background-color: #0f0f0f;
+            background-image: radial-gradient(#27272a 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #FACC15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-brand-yellow selection:text-black">
+
+    <!-- NAV BAR -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-brand-gray">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer group" onclick="router('home')">
+                    <div class="bg-brand-yellow text-black p-2.5 rounded-xl mr-3 transform group-hover:rotate-12 transition duration-300">
+                        <i class="fa-solid fa-code text-2xl"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-black text-xl tracking-wider text-white">Elythra</span>
+                        <span class="text-brand-yellow text-xs font-bold tracking-[0.2em] -mt-1">Share</span>
+                    </div>
+                </div>
+
+                <!-- Menü -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-1 bg-white/5 p-1 rounded-full border border-white/5 backdrop-blur-md">
+                        <a href="#" onclick="router('home')" class="nav-link px-5 py-2 rounded-full text-sm font-medium hover:bg-brand-yellow hover:text-black transition duration-300">Əsas Səhifə</a>
+                        <a href="#" onclick="router('licenses')" class="nav-link px-5 py-2 rounded-full text-sm font-medium hover:bg-brand-yellow hover:text-black transition duration-300">Lisans</a>
+                        <a href="#" onclick="router('management')" class="nav-link px-5 py-2 rounded-full text-sm font-medium hover:bg-brand-yellow hover:text-black transition duration-300">Developers</a>
+                        <a href="#" onclick="router('codes')" class="nav-link px-5 py-2 rounded-full text-sm font-medium text-brand-yellow border border-brand-yellow/20 hover:bg-brand-yellow hover:text-black transition duration-300 ml-2">Kodlar</a>
+                    </div>
+                </div>
+
+                <!-- Sağ Taraf: Profil/Auth -->
+                <div id="auth-section"></div>
+                
+                <!-- Mobil Menü Butonu -->
+                <div class="-mr-2 flex md:hidden">
+                    <button onclick="toggleMobileMenu()" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobil Menü -->
+        <div class="md:hidden hidden bg-black/95 backdrop-blur-xl border-b border-gray-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" onclick="router('home')" class="block px-3 py-4 rounded-md text-base font-medium hover:bg-brand-gray border-b border-gray-800">Əsas Səhifə</a>
+                <a href="#" onclick="router('licenses')" class="block px-3 py-4 rounded-md text-base font-medium hover:bg-brand-gray border-b border-gray-800">Lisans</a>
+                <a href="#" onclick="router('management')" class="block px-3 py-4 rounded-md text-base font-medium hover:bg-brand-gray border-b border-gray-800">Developers</a>
+                <a href="#" onclick="router('codes')" class="block px-3 py-4 rounded-md text-base font-bold text-brand-yellow">Kodlar</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ANA İÇERİK -->
+    <main class="flex-grow container mx-auto px-4 py-8 relative">
+        <!-- Arkaplan Efektleri -->
+        <div class="fixed top-20 left-0 w-96 h-96 bg-brand-yellow/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+        <div class="fixed bottom-0 right-0 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+        
+        <!-- Sayfa: ANASAYFA -->
+        <div id="page-home" class="page-section animate-fade-in">
+            <div class="text-center mt-12 md:mt-24">
+                <div class="inline-block px-4 py-1.5 mb-6 rounded-full border border-brand-yellow/30 bg-brand-yellow/5 text-brand-yellow text-xs font-mono font-bold tracking-wide animate-pulse">
+                    v1.0 YAYIMDA
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                    Elythra <br> <span class="gradient-text">İnkişafın Mərkəzi</span>
+                </h1>
+                <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                    Elythra Share ilə kodlamanın ən zirvələrinə doğru addım atın!
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="router('codes')" class="bg-brand-yellow text-black font-bold py-4 px-10 rounded-xl hover:bg-white hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(250,204,21,0.4)] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rocket"></i> Kəşf Et!
+                    </button>
+                    <button onclick="router('licenses')" class="glass-panel border border-white/10 text-white font-bold py-4 px-10 rounded-xl hover:bg-white/5 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-file-lines"></i> Qaydalar!
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sayfa: LİSANS -->
+        <div id="page-licenses" class="page-section hidden">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-8 border-l-4 border-brand-yellow pl-4">Lisanslar Və Qaydalar</h2>
+                
+                <div class="grid gap-6">
+                    <!-- Kural 1 -->
+                    <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <i class="fa-solid fa-scale-balanced text-9xl text-brand-yellow"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-gavel text-brand-yellow"></i> 1. İstifadə Qaydaları
+                        </h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Elythra Share saytımızıda başqa insanların kodlarını götürüb özünüzün kodu kimi paylaşmaq qəti qadağandır bu hal ilə rastlaşsaq serverdən uzaqlaşdırma ilə nəticələnəcək.
+                        </p>
+                    </div>
+
+                    <!-- Kural 2 -->
+                    <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <i class="fa-solid fa-user-shield text-9xl text-brand-yellow"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-brand-yellow"></i> 2. Gizlilik Və Məlumat Haqqında
+                        </h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Platformaya daxil olmaq üçün istifadə edilən Discord məlumatları (İstifadəçi adı, Avatar, E-poçt) yalnız identifikasiya və moderasiya məqsədləri üçün sistem jurnalında (webhook) qeyd olunur. Bu məlumatlar başqaları ilə paylaşıla bilməz.
+                        </p>
+                    </div>
+
+                    <!-- Kural 3 -->
+                    <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <i class="fa-solid fa-share-nodes text-9xl text-brand-yellow"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-code-branch text-brand-yellow"></i> 3. Paylaşım Standartları
+                        </h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Zərərli proqram təminatı, token ələ keçirən, sistemi pozan kod və ya +18 məzmunlu materialların paylaşılması daimi qadağan üçün əsasdır. Paylaşılan kod işlək olmalı və düzgün kateqoriyalara bölünməlidir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sayfa: YÖNETİM -->
+        <div id="page-management" class="page-section hidden">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-white">Yönetim Kadrosu</h2>
+                    <p class="text-gray-500 mt-2">Yetkili Komandası.</p>
+                </div>
+
+                <!-- 1. Yöneticiler -->
+                <div class="mb-12">
+                    <h3 class="text-xl font-bold text-brand-yellow mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-crown"></i> Yöneticiler (Admins)
+                    </h3>
+                    <div id="admin-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- 2. Moderatorlar -->
+                <div class="mb-12">
+                    <h3 class="text-xl font-bold text-blue-400 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-shield-cat"></i> Moderatkrlar
+                    </h3>
+                    <div id="mod-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- 3. Özel Teşekkürler -->
+                <div>
+                    <h3 class="text-xl font-bold text-pink-400 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-heart"></i> Destekçiler
+                    </h3>
+                    <div id="thanks-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sayfa: KODLAR -->
+        <div id="page-codes" class="page-section hidden">
+            <!-- Durum 1: Giriş Yapılmamış -->
+            <div id="codes-locked" class="flex flex-col items-center justify-center h-[60vh] text-center">
+                <div class="p-10 rounded-3xl border border-gray-800 bg-[#121212] max-w-md w-full relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-yellow to-transparent"></div>
+                    <div class="w-24 h-24 bg-[#5865F2] rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl group-hover:scale-110 transition duration-500">
+                        <i class="fa-brands fa-discord text-5xl text-white"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-3 text-white">Discord ilə giriş elə!</h2>
+                    <p class="text-gray-400 mb-8 text-sm">Kodlara giriş üçün hesabını bağla.</p>
+                    <button onclick="loginWithDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-3 text-lg">
+                        <i class="fa-brands fa-discord"></i> Bağlan
+                    </button>
+                    <p class="text-[10px] text-gray-600 mt-4">Giriş Et Və Kodlara Daxil Ol.</p>
+                </div>
+            </div>
+
+            <!-- Durum 2: Giriş Yapılmış -->
+            <div id="codes-unlocked" class="hidden">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold border-l-4 border-brand-yellow pl-4">Kodlar</h2>
+                        <p class="text-gray-500 text-sm mt-1 pl-4">Ən Təzə Kodlar</p>
+                    </div>
+                    <button onclick="openShareModal()" class="bg-brand-yellow text-black font-bold py-3 px-6 rounded-xl hover:bg-white transition flex items-center gap-2 shadow-lg">
+                        <i class="fa-solid fa-plus"></i> Kod Paylaş
+                    </button>
+                </div>
+
+                <!-- Kod Listesi Grid -->
+                <div id="codes-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Kod kartları JS ile buraya eklenecek -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sayfa: PROFİLİM -->
+        <div id="page-profile" class="page-section hidden">
+            <div class="glass-panel rounded-3xl overflow-hidden max-w-4xl mx-auto border border-gray-800">
+                <!-- Profil Header -->
+                <div class="h-40 bg-gradient-to-r from-gray-900 via-[#1a1a1a] to-brand-yellow/30 relative">
+                     <div class="absolute top-4 right-4 bg-black/50 backdrop-blur px-3 py-1 rounded text-xs text-white border border-white/10">
+                        ID: <span id="profile-id-display" class="font-mono text-gray-400">---</span>
+                     </div>
+                </div>
+                <div class="px-8 pb-8">
+                    <div class="relative flex flex-col md:flex-row justify-between items-end -mt-16 mb-8 gap-4">
+                        <div class="flex items-end">
+                            <div class="relative">
+                                <img id="profile-page-avatar" src="" alt="Profile" class="w-32 h-32 rounded-3xl border-4 border-[#050505] shadow-2xl bg-gray-800 object-cover">
+                                <div class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-[#050505]" title="Online"></div>
+                            </div>
+                            <div class="ml-5 mb-3">
+                                <h1 id="profile-page-name" class="text-3xl font-bold text-white">İstifadəçi</h1>
+                                <div class="flex gap-2 mt-1">
+                                    <span class="bg-brand-yellow/20 text-brand-yellow px-2 py-0.5 rounded text-xs font-bold border border-brand-yellow/30">Developers</span>
+                                    <span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-xs font-bold border border-blue-500/30">Doğrulanmış</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/20 font-bold py-2 px-6 rounded-lg transition text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-right-from-bracket"></i> Çıxış Et!
+                        </button>
+                    </div>
+
+                    <!-- Profil İstatistikleri -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                        <div class="bg-[#121212] p-4 rounded-xl border border-gray-800 text-center">
+                            <div id="profile-total-codes" class="text-2xl font-bold text-white mb-1">0</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Paylaşımlar</div>
+                        </div>
+                        <div class="bg-[#121212] p-4 rounded-xl border border-gray-800 text-center">
+                            <div class="text-2xl font-bold text-brand-yellow mb-1">4.9</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">İtibar Puanı</div>
+                        </div>
+                        <div class="bg-[#121212] p-4 rounded-xl border border-gray-800 text-center">
+                            <div class="text-2xl font-bold text-green-400 mb-1">Aktif</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Hesab Durumu</div>
+                        </div>
+                        <div class="bg-[#121212] p-4 rounded-xl border border-gray-800 text-center">
+                            <div id="profile-server-count" class="text-2xl font-bold text-blue-400 mb-1">0</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Sunucular</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-brand-yellow"></i> Paylaşım Keçmişi
+                    </h3>
+                    <div id="user-codes-list" class="space-y-4">
+                        <!-- Kullanıcı kodları buraya -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-900 mt-auto py-10 bg-[#020202]">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 text-center md:text-left">
+                    <span class="font-bold text-xl tracking-wider text-white">Elythra <span class="text-brand-yellow">Share</span></span>
+                    <p class="text-gray-600 text-xs mt-2 max-w-xs">Gəliştiricilər üçün ən yaxşı kod paylaşım platforması.</p>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-[#5865F2] transition"><i class="fa-brands fa-discord text-2xl"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-[#1DA1F2] transition"><i class="fa-brands fa-twitter text-2xl"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-white transition"><i class="fa-brands fa-github text-2xl"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-pink-500 transition"><i class="fa-brands fa-instagram text-2xl"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-gray-900 mt-8 pt-8 text-center text-gray-700 text-xs">
+                &copy; 2026 Elythra Share Inc. Powered and Developed By RevanDev.
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: KOD PAYLAŞ -->
+    <div id="share-modal" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#121212] border border-gray-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl transform transition-all scale-100 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-[#0a0a0a]">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-code-branch text-brand-yellow"></i> Təzə Kod Paylaş</h3>
+                <button onclick="closeShareModal()" class="text-gray-400 hover:text-white bg-gray-800 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-5 overflow-y-auto custom-scrollbar">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Kod Başlığı</label>
+                    <input type="text" id="input-title" class="w-full bg-[#18181b] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow transition" placeholder="Örn: Moderasyon Botu V14">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Dil Seçimi</label>
+                    <div class="relative">
+                        <select id="input-lang" class="w-full bg-[#18181b] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-yellow appearance-none cursor-pointer">
+                            <option value="JavaScript">JavaScript (Node.js)</option>
+                            <option value="Python">Python</option>
+                            <option value="HTML/CSS">HTML/CSS</option>
+                            <option value="C#">C#</option>
+                            <option value="Java">BDFD</option>
+                            <option value="Java">Discord.JS</option>
+                            <option value="Java">Aoi.JS</option>
+                            <option value="Java">Bdfd (Bot Desinger For Discord)</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                        <div class="absolute right-4 top-4 text-gray-500 pointer-events-none"><i class="fa-solid fa-chevron-down"></i></div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Kod</label>
+                    <textarea id="input-content" rows="8" class="w-full bg-[#18181b] border border-gray-700 rounded-lg px-4 py-3 font-mono text-sm text-gray-300 focus:outline-none focus:border-brand-yellow" placeholder="// Kodunuzu bura yapıştırın..."></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-800 bg-[#0a0a0a] flex justify-end gap-3">
+                <button onclick="closeShareModal()" class="px-6 py-3 text-gray-400 hover:text-white transition font-medium">Ləğv Et!</button>
+                <button onclick="submitCode()" class="bg-brand-yellow text-black font-bold px-8 py-3 rounded-xl hover:bg-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Yayımla
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // AYARLAR (Burayı Düzenle)
+        // ==========================================
+        // Discord Webhook URL'sini buraya yapıştırın.
+        // Dikkat: Client-side isteklerde bazen CORS hatası olabilir, 
+        // ancak tarayıcıda çalışması için 'no-cors' veya proxy gerekebilir.
+        // Normal şartlarda bu veri backend üzerinden atılmalıdır. 
+        const DISCORD_WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL"; 
+        
+        // ==========================================
+        // VERİ VE STATE
+        // ==========================================
+        const currentUserKey = 'elythra_user_v2';
+        const codesKey = 'elythra_codes_v2';
+
+        // Yönetim Kadrosu Verisi (Düzenlenebilir)
+        const teamData = {
+            admins: [
+                { name: "Onur", role: "Owner", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=King&backgroundColor=b6e3f4" },
+                { name: "Yakup", role: "Dev", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dev&backgroundColor=c0aede" }
+            ],
+            mods: [
+                { name: "Moderatör 1", role: "Mod", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mod1" },
+                { name: "Moderatör 2", role: "Mod", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mod2" },
+                { name: "Destek", role: "Support", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Support" }
+            ],
+            thanks: [
+                { name: "Sponsor A", role: "VIP", img: "https://api.dicebear.com/7.x/initials/svg?seed=SA" },
+                { name: "Sponsor B", role: "VIP", img: "https://api.dicebear.com/7.x/initials/svg?seed=SB" }
+            ]
+        };
+
+        // Varsayılan Kodlar (Eğer localStorage boşsa)
+        const defaultCodes = [
+            {
+                id: 1,
+                title: "Gelişmiş Kayıt Botu",
+                lang: "JavaScript",
+                content: "const { Client, GatewayIntentBits } = require('discord.js');\nconst client = new Client({ intents: [GatewayIntentBits.Guilds] });\n\nclient.on('ready', () => {\n  console.log(`Bot ${client.user.tag} olarak giriş yaptı!`);\n});\n\nclient.login('TOKEN');",
+                author: { name: "SystemAdmin", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=admin", id: "001" },
+                date: "15 Ocak 2024"
+            },
+            {
+                id: 2,
+                title: "Hesap Makinesi GUI",
+                lang: "Python",
+                content: "import tkinter as tk\n\nroot = tk.Tk()\nroot.title('Hesap Makinesi')\n\nlabel = tk.Label(root, text='Merhaba Dünya')\nlabel.pack()\n\nroot.mainloop()",
+                author: { name: "PythonMaster", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Py", id: "002" },
+                date: "16 Ocak 2024"
+            }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem(currentUserKey)) || null;
+        let codes = JSON.parse(localStorage.getItem(codesKey)) || defaultCodes;
+
+        // ==========================================
+        // YÖNETİM SAYFASI RENDER
+        // ==========================================
+        function renderManagement() {
+            // Adminler
+            const adminGrid = document.getElementById('admin-grid');
+            if(adminGrid.innerHTML === "") { // Sadece boşsa doldur
+                teamData.admins.forEach(member => {
+                    adminGrid.innerHTML += createTeamCard(member, 'border-brand-yellow', 'text-brand-yellow');
+                });
+            }
+
+            // Modlar
+            const modGrid = document.getElementById('mod-grid');
+            if(modGrid.innerHTML === "") {
+                teamData.mods.forEach(member => {
+                    modGrid.innerHTML += createTeamCard(member, 'border-blue-500', 'text-blue-400');
+                });
+            }
+
+            // Teşekkürler
+            const thanksGrid = document.getElementById('thanks-grid');
+            if(thanksGrid.innerHTML === "") {
+                teamData.thanks.forEach(member => {
+                    thanksGrid.innerHTML += createTeamCard(member, 'border-pink-500', 'text-pink-400');
+                });
+            }
+        }
+
+        function createTeamCard(member, borderColorClass, textColorClass) {
+            return `
+                <div class="glass-panel p-6 rounded-2xl text-center group hover:scale-105 transition duration-300 border-t-4 ${borderColorClass}">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-2 border-gray-700 group-hover:border-white transition">
+                        <img src="${member.img}" alt="${member.name}" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-white font-bold text-lg">${member.name}</h4>
+                    <span class="text-xs uppercase tracking-widest font-bold ${textColorClass}">${member.role}</span>
+                </div>
+            `;
+        }
+
+
+        // ==========================================
+        // ROUTER & NAVIGATION
+        // ==========================================
+        function router(pageId) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
+            
+            const page = document.getElementById(`page-${pageId}`);
+            if(page) {
+                page.classList.remove('hidden');
+                
+                if(pageId === 'codes') checkAuthForCodes();
+                if(pageId === 'management') renderManagement();
+                if(pageId === 'profile') {
+                    if(!currentUser) {
+                        router('home');
+                        alert("Profil görüntülemek için önce giriş yapmalısınız.");
+                    } else {
+                        renderProfile();
+                    }
+                }
+            }
+            document.getElementById('mobile-menu').classList.add('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // ==========================================
+        // AUTHENTICATION & WEBHOOK
+        // ==========================================
+        function updateAuthUI() {
+            const authSection = document.getElementById('auth-section');
+            if (currentUser) {
+                authSection.innerHTML = `
+                    <div class="flex items-center gap-3 cursor-pointer p-1.5 pr-4 rounded-full bg-white/5 hover:bg-white/10 transition border border-white/10" onclick="router('profile')">
+                        <img src="${currentUser.avatar}" class="w-8 h-8 rounded-full border border-brand-yellow">
+                        <div class="hidden md:flex flex-col items-start leading-none">
+                            <span class="text-xs font-bold text-white">${currentUser.username}</span>
+                            <span class="text-[10px] text-gray-400">Üzv</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <button onclick="router('codes')" class="text-xs font-bold bg-[#5865F2] hover:bg-[#4752C4] text-white px-5 py-2.5 rounded-full shadow-lg transition flex items-center gap-2">
+                        <i class="fa-brands fa-discord"></i> Giriş Et!
+                    </button>
+                `;
+            }
+        }
+
+        async function loginWithDiscord() {
+            const button = document.querySelector('#codes-locked button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xl"></i> Giriş Edilir...';
+            button.disabled = true;
+            
+            // Gerçekçi Veri Simülasyonu
+            // Normalde bu veriler Discord API'den oauth2 token ile backend üzerinden gelir.
+            // HTML dosyasında olduğumuz için bu veriyi "gelmiş gibi" oluşturup webhook'a atacağız.
+            const mockUser = {
+                id: Math.floor(Math.random() * 10000000000000000).toString(),
+                username: 'ElythraMember_' + Math.floor(Math.random() * 1000),
+                email: 'user' + Math.floor(Math.random() * 999) + '@example.com', // Simüle edilmiş email
+                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random()}`,
+                guilds: ['Petland Main', 'Code Share Hub', 'Developers TR'] // Simüle edilmiş sunucular
+            };
+
+            setTimeout(async () => {
+                currentUser = mockUser;
+                localStorage.setItem(currentUserKey, JSON.stringify(currentUser));
+                
+                // Webhook'a Log Gönder
+                await sendToWebhook("Giriş Logu", 0x5865F2, [
+                    { name: "Kullanıcı Adı", value: mockUser.username, inline: true },
+                    { name: "Email (Simüle)", value: mockUser.email, inline: true },
+                    { name: "Sunucu Sayısı", value: mockUser.guilds.length.toString(), inline: true },
+                    { name: "Kullanıcı ID", value: mockUser.id, inline: false }
+                ]);
+
+                updateAuthUI();
+                checkAuthForCodes();
+                alert(`Hoşgeldin ${currentUser.username}! Başarıyla giriş yapıldı.`);
+            }, 2000);
+        }
+
+        function logout() {
+            if(confirm("Çıkış yapmak istediğinize emin misiniz?")) {
+                currentUser = null;
+                localStorage.removeItem(currentUserKey);
+                updateAuthUI();
+                router('home');
+            }
+        }
+
+        function checkAuthForCodes() {
+            const lockedView = document.getElementById('codes-locked');
+            const unlockedView = document.getElementById('codes-unlocked');
+
+            if (currentUser) {
+                lockedView.classList.add('hidden');
+                unlockedView.classList.remove('hidden');
+                renderCodes();
+            } else {
+                lockedView.classList.remove('hidden');
+                unlockedView.classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        // WEBHOOK SİSTEMİ
+        // ==========================================
+        async function sendToWebhook(title, color, fields) {
+            if (DISCORD_WEBHOOK_URL === "https://discord.com/api/webhooks/1462107364470816778/p-fr4l7YWMIT8NSezOLYeXqMxunJuAKlz4p6HN3r-HFX3LdZGOJqLgmMRh1jRPb35rOe" || !DISCORD_WEBHOOK_URL) {
+                console.warn("Webhook URL ayarlanmadığı için log gönderilmedi.");
+                return;
+            }
+
+            const embed = {
+                title: title,
+                color: color,
+                fields: fields,
+                footer: { text: "Elythra Share System", icon_url: "https://cdn-icons-png.flaticon.com/512/25/25231.png" }, // GitHub icon as generic
+                timestamp: new Date().toISOString()
+            };
+
+            const body = {
+                username: "Elythra Logger",
+                avatar_url: "https://cdn-icons-png.flaticon.com/512/919/919847.png", // Code icon
+                embeds: [embed]
+            };
+
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+                console.log("Webhook gönderildi.");
+            } catch (error) {
+                console.error("Webhook Hatası (Muhtemelen CORS veya URL hatalı):", error);
+            }
+        }
+
+        // ==========================================
+        // KOD İŞLEMLERİ
+        // ==========================================
+        function renderCodes() {
+            const grid = document.getElementById('codes-grid');
+            grid.innerHTML = '';
+
+            codes.forEach(code => {
+                const card = `
+                <div class="glass-panel rounded-xl overflow-hidden hover:border-brand-yellow/50 transition duration-300 group flex flex-col h-full">
+                    <div class="p-5 border-b border-white/5 flex justify-between items-start bg-black/20">
+                        <div>
+                            <div class="text-[10px] font-mono font-bold text-brand-yellow mb-2 bg-brand-yellow/10 inline-block px-2 py-1 rounded border border-brand-yellow/20 uppercase">${code.lang}</div>
+                            <h3 class="text-lg font-bold text-white group-hover:text-brand-yellow transition leading-tight">${code.title}</h3>
+                        </div>
+                        <button class="text-gray-500 hover:text-white bg-white/5 p-2 rounded-lg transition" onclick="copyCode('${escapeJsStr(code.content)}')" title="Kopyala">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-[#0a0a0a] p-5 flex-grow relative group-hover:bg-[#0f0f0f] transition">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-gray-800 group-hover:bg-brand-yellow transition"></div>
+                        <pre class="text-xs text-gray-400 font-mono overflow-hidden h-24 opacity-80"><code>${escapeHtml(code.content)}</code></pre>
+                        <div class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#0a0a0a] to-transparent"></div>
+                    </div>
+
+                    <div class="p-4 bg-black/40 border-t border-white/5 flex items-center gap-3">
+                        <img src="${code.author.avatar}" class="w-9 h-9 rounded-full border border-gray-700">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-white font-bold">${code.author.name}</span>
+                            <span class="text-[10px] text-gray-500">${code.date}</span>
+                        </div>
+                    </div>
+                </div>`;
+                grid.innerHTML += card;
+            });
+        }
+
+        function renderProfile() {
+            document.getElementById('profile-page-avatar').src = currentUser.avatar;
+            document.getElementById('profile-page-name').innerHTML = currentUser.username;
+            document.getElementById('profile-id-display').innerHTML = currentUser.id;
+            document.getElementById('profile-server-count').innerHTML = currentUser.guilds ? currentUser.guilds.length : 0;
+            
+            // Sadece bu kullanıcıya ait kodlar (Mock ID eşleşmesi veya İsim eşleşmesi)
+            const userCodes = codes.filter(c => c.author.name === currentUser.username);
+            document.getElementById('profile-total-codes').innerText = userCodes.length;
+
+            const list = document.getElementById('user-codes-list');
+            list.innerHTML = '';
+            
+            if(userCodes.length === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center p-8 border border-dashed border-gray-800 rounded-xl text-gray-600">
+                        <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
+                        <span>Hələki Kod Yoxdur!.</span>
+                    </div>`;
+            } else {
+                userCodes.forEach(code => {
+                    list.innerHTML += `
+                        <div class="glass-panel p-4 rounded-xl flex justify-between items-center border border-white/5 hover:border-brand-yellow/30 transition group">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-brand-yellow/10 p-3 rounded-lg text-brand-yellow group-hover:bg-brand-yellow group-hover:text-black transition">
+                                    <i class="fa-solid fa-code"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm md:text-base">${code.title}</h4>
+                                    <span class="text-xs text-gray-500">${code.lang} • ${code.date}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyCode('${escapeJsStr(code.content)}')" class="text-gray-500 hover:text-white px-3 py-1"><i class="fa-regular fa-copy"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function openShareModal() {
+            document.getElementById('share-modal').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-modal').classList.add('hidden');
+            document.getElementById('input-title').value = '';
+            document.getElementById('input-content').value = '';
+        }
+
+        async function submitCode() {
+            const title = document.getElementById('input-title').value;
+            const lang = document.getElementById('input-lang').value;
+            const content = document.getElementById('input-content').value;
+
+            if(!title || !content) {
+                alert("Xaiş Olunur Hər Tərəfi Doldurun!");
+                return;
+            }
+
+            const newCode = {
+                id: Date.now(),
+                title: title,
+                lang: lang,
+                content: content,
+                author: {
+                    name: currentUser.username,
+                    avatar: currentUser.avatar,
+                    id: currentUser.id
+                },
+                date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+            };
+
+            codes.unshift(newCode); // Listede başa ekle
+            localStorage.setItem(codesKey, JSON.stringify(codes)); // Kalıcı kaydet
+            
+            // Webhook'a Bildirim Gönder
+            await sendToWebhook("Yeni Kod Paylaşıldı! 🚀", 0xFACC15, [
+                { name: "Kod Adı", value: title, inline: true },
+                { name: "Dil", value: lang, inline: true },
+                { name: "Paylaşan", value: currentUser.username, inline: false },
+                { name: "Önizleme", value: content.substring(0, 100) + (content.length > 100 ? "..." : ""), inline: false }
+            ]);
+
+            closeShareModal();
+            renderCodes();
+            renderProfile(); // Profildeki sayıyı güncelle
+            alert("Kod başarıyla paylaşıldı ve Discord loglarına işlendi!");
+        }
+
+        // ==========================================
+        // YARDIMCI FONKSİYONLAR
+        // ==========================================
+        function escapeHtml(text) {
+            if(!text) return "";
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        function escapeJsStr(text) {
+             if(!text) return "";
+             return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+        }
+        
+        function copyCode(content) {
+             navigator.clipboard.writeText(content).then(() => {
+                // Basit bir toast mesajı gösterilebilir, şimdilik alert
+                alert("Kod panoya kopyalandı!");
+             });
+        }
+
+        // Başlangıç
+        window.onload = function() {
+            updateAuthUI();
+            router('home');
+        }
+    </script>
+</body>
+</html>
